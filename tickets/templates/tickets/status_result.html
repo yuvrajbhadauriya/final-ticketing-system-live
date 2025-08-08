@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl p-8 text-center bg-white rounded-xl shadow-lg">
+        {% if submission %}
+            <h1 class="text-3xl font-bold text-gray-800">Status for {{ submission.email }}</h1>
+            <div class="mt-6 p-6 rounded-lg 
+                {% if submission.status == 'approved' %} bg-green-50 border-green-200 {% endif %}
+                {% if submission.status == 'rejected' %} bg-red-50 border-red-200 {% endif %}
+                {% if submission.status == 'pending' %} bg-yellow-50 border-yellow-200 {% endif %}
+                border">
+                <p class="text-lg font-medium">Your ticket is currently: 
+                    <span class="font-bold 
+                        {% if submission.status == 'approved' %} text-green-700 {% endif %}
+                        {% if submission.status == 'rejected' %} text-red-700 {% endif %}
+                        {% if submission.status == 'pending' %} text-yellow-700 {% endif %}">
+                        {{ submission.get_status_display }}
+                    </span>
+                </p>
+
+                {% if submission.status == 'approved' %}
+                    <p class="mt-2 text-sm text-gray-600">Congratulations! Your ticket is ready. You can use the preview below or download the official PDF.</p>
+
+                    <div class="my-6 text-left">
+                        <h2 class="text-lg font-semibold mb-2 text-center">Ticket Preview</h2>
+                        <div class="bg-gray-800 text-white rounded-lg shadow-md p-6 flex flex-col sm:flex-row gap-6 items-center">
+                            <div class="flex-grow">
+                                <h3 class="text-3xl font-bold text-red-500">TEDxVIPS'25</h3>
+                                <p class="text-xl font-semibold text-red-400 mb-4">| IGNITED</p>
+
+                                <div class="text-sm space-y-2 text-gray-300">
+                                    <p><strong class="font-semibold text-white">ATTENDEE:</strong> {{ submission.full_name }}</p>
+                                    <p><strong class="font-semibold text-white">EMAIL:</strong> {{ submission.email }}</p>
+                                    <p><strong class="font-semibold text-white">TICKET ID:</strong> <span class="text-red-400 font-bold">{{ submission.ticket_id }}</span></p>
+                                    <p><strong class="font-semibold text-white">GATE:</strong> 4A</p>
+                                </div>
+                            </div>
+                            <div id="qrcode-preview" class="bg-white p-2 rounded-md flex-shrink-0"></div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'download_ticket' submission.id %}" class="mt-4 inline-block bg-green-600 text-white font-bold py-2 px-5 rounded-lg transition hover:bg-green-700">Download Your Ticket (PDF)</a>
+                {% elif submission.status == 'pending' %}
+                    <p class="mt-2 text-sm text-gray-600">Our team is reviewing your submission. Please check back later.</p>
+                {% else %}
+                    <p class="mt-2 text-sm text-gray-600">There was an issue with your submission. Please contact support for assistance.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <h1 class="text-3xl font-bold text-red-600">Submission Not Found</h1>
+            <p class="mt-4 text-gray-700">{{ error }}</p>
+        {% endif %}
+
+        <a href="{% url 'check_status' %}" class="mt-8 inline-block text-indigo-600 hover:underline">Check another email</a>
+    </div>
+
+    {% if submission and submission.status == 'approved' %}
+    <script>
+        // Use the secure qr_code_id for the preview QR code's data
+        new QRCode(document.getElementById("qrcode-preview"), {
+            text: "{{ submission.qr_code_id }}",
+            width: 128,
+            height: 128,
+            colorDark : "#e62b1e",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

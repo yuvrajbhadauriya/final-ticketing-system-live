@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Ticket Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-800">Check Your Ticket Status</h1>
+        <p class="text-center text-gray-600">Enter the email you used during submission to see your ticket's verification status.</p>
+
+        <form action="{% url 'status_result' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" name="email" id="email" required class="w-full px-4 py-3 mt-1 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg transition hover:bg-indigo-700">
+                    Check Status
+                </button>
+            </div>
+        </form>
+         <p class="text-center text-sm text-gray-500 mt-4">
+            <a href="{% url 'submission_form' %}" class="font-medium text-indigo-600 hover:underline">Back to submission form</a>
+        </p>
+    </div>
+</body>
+</html>

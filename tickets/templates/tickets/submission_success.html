@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Successful</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg p-8 text-center bg-white rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-green-600">Thank You!</h1>
+        <p class="mt-4 text-gray-700">
+            Your submission has been received. You will receive an email with your ticket once your payment is verified. You can track your ticket status on the status page, and once verified, you can download it from there.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'submission_form' %}" class="w-full sm:w-auto inline-block bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg transition hover:bg-gray-300">
+                Back to Submission Form
+            </a>
+            <a href="{% url 'check_status' %}" class="w-full sm:w-auto inline-block bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transition hover:bg-indigo-700">
+                Check Ticket Status
+            </a>
+        </div>
+    </div>
+</body>
+</html>
