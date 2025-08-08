@@ -33,13 +33,15 @@ WSGI_APPLICATION = 'ticketing_project.wsgi.application'
 
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
 
-# Email settings for Mailgun
-ANYMAIL = {
-    "MAILGUN_API_KEY": os.environ.get('MAILGUN_API_KEY'),
-    "MAILGUN_SENDER_DOMAIN": os.environ.get('MAILGUN_SENDER_DOMAIN'),
-}
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-DEFAULT_FROM_EMAIL = "tickets@your_verified_mailgun_domain.com" # Replace with your real domain later
+
+# --- NEW: Email Settings for Gmail ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yuvraj.tedx@gmail.com'  # <-- REPLACE THIS with your full Gmail address
+EMAIL_HOST_PASSWORD = 'xiiohxweueoggohy' # This is your App Password (spaces removed)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
