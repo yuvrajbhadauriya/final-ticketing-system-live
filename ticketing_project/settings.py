@@ -15,7 +15,7 @@ else:
     # Settings for your local computer
     DEBUG = True
     SECRET_KEY = 'django-insecure-a-temporary-secret-key-for-local-dev'
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
 
 # Application definition
 INSTALLED_APPS = [
