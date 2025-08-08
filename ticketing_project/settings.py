@@ -2,10 +2,12 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-a-temporary-secret-key-for-local-dev'
-DEBUG = False # Set to False for production
+
+# Production settings
+DEBUG = False
 ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
 
-# This is also a crucial security setting for production
+# This is the crucial new line for the 403 error
 CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com']
 
 INSTALLED_APPS = [
