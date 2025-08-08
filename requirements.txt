@@ -8,3 +8,4 @@ whitenoise
 reportlab
 qrcode
 pdf2image
+django-anymail
