@@ -1,15 +1,23 @@
 from pathlib import Path
+import os # Import the os module
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-a-temporary-secret-key-for-local-dev'
 
-# Production settings
-DEBUG = False
-ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
+# --- Smart Settings for Live vs. Local ---
+# Check if the code is running on PythonAnywhere
+if 'PYTHONANYWHERE_SITE' in os.environ:
+    DEBUG = False
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') # Will be set on the server
+    ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
+    CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com']
+else:
+    # Settings for your local computer
+    DEBUG = True
+    SECRET_KEY = 'django-insecure-a-temporary-secret-key-for-local-dev'
+    ALLOWED_HOSTS = []
 
-# This is the crucial new line for the 403 error
-CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com']
-
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,15 +25,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
+    'anymail', # Add anymail
     'tickets',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -53,6 +59,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ticketing_project.wsgi.application'
 
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -60,16 +67,36 @@ DATABASES = {
     }
 }
 
+# --- Email Configuration ---
+if 'PYTHONANYWHERE_SITE' in os.environ:
+    # Live settings for Mailgun
+    ANYMAIL = {
+        "MAILGUN_API_KEY": os.environ.get('MAILGUN_API_KEY'),
+        "MAILGUN_SENDER_DOMAIN": os.environ.get('MAILGUN_SENDER_DOMAIN'),
+    }
+    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+    DEFAULT_FROM_EMAIL = "tickets@your_verified_mailgun_domain.com" # Replace with your real domain later
+else:
+    # Local settings (Gmail or console)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'yuvraj.tedx@gmail.com'
+    EMAIL_HOST_PASSWORD = 'xiiohxweueoggohy'
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# Static and Media files
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles_build'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Other settings
 AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles_build'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
