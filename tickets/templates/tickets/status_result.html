@@ -74,7 +74,7 @@
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-2xl mx-auto minimal-card text-center" style="position: relative; z-index: 1;">
         {% if submission %}
-            <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #FFFFFF;">Status for {{ submission.email }}</span></h1>
+            <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #eb0028;">Status for </span><span style="color: #FFFFFF;">{{ submission.email }}</span></h1>
             <div class="mt-6 p-6 rounded-lg minimal-bg">
                 <p class="text-lg font-medium">Your ticket is currently: 
                     <span class="font-bold 
@@ -118,7 +118,7 @@
             <p class="mt-4 text-gray-300">{{ error }}</p>
         {% endif %}
 
-        <a href="{% url 'check_status' %}" class="mt-8 inline-block accent hover:underline">Check another email</a>
+        <a href="{% url 'check_status' %}" class="mt-8 inline-block minimal-btn py-2 px-5">Check another email</a>
     </div>
 
     {% if submission and submission.status == 'approved' %}
