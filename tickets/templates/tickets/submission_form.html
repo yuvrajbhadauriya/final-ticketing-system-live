@@ -5,54 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Your Ticket Request</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TEDx Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background-image: url('https://i.ibb.co/TMwMPqy7/VIPS-ID-pdf.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #E0E0E0;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        h1, h2, .accent, .accent-bg, .minimal-btn {
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .minimal-bg {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+        }
+        .accent {
+            color: #eb0028;
+        }
+        .accent-bg {
+            background: #eb0028;
+            color: #fff;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.10);
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .minimal-btn {
+            background: #eb0028;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.08);
+            letter-spacing: 0.03em;
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+            border: none;
+            outline: none;
+        }
+        .minimal-btn:hover, .minimal-btn:focus {
+            background: #b80020;
+            box-shadow: 0 4px 16px 0 rgba(235,0,40,0.12);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .minimal-label {
+            color: #E0E0E0;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.01em;
+            font-family: 'Roboto', 'Arial', sans-serif;
+        }
+        input[type="text"], input[type="email"], input[type="file"] {
+            width: 100%;
+            padding: 0.85rem 1.1rem;
+            border: 1.5px solid #424242;
+            border-radius: 0.85rem;
+            margin-top: 0.25rem;
+            background: #252525;
+            color: #E0E0E0;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+            font-family: 'Roboto', 'Arial', sans-serif;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="file"]:focus {
+            border-color: #eb0028;
+            box-shadow: 0 0 8px 0 rgba(235,0,40,0.5);
+            outline: none;
+        }
+        input[type="file"] {
+            padding: 0.5rem 1.1rem;
+        }
+        .minimal-card {
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+            padding: 0;
+        }
+        .minimal-divider {
+            border-right: 1.5px solid #424242;
+        }
+        .minimal-card img {
+            transition: box-shadow 0.2s, transform 0.2s;
+            background: #fff;
+        }
+        .minimal-card img:hover {
+            box-shadow: 0 4px 16px 0 rgba(235,0,40,0.12);
+            transform: scale(1.04);
+        }
+        .error-box {
+            background: #2E1A1A;
+            color: #F48A8A;
+            border: 1.5px solid #eb0028;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.05);
+        }
+        .form-section {
+            padding: 2.5rem 2rem;
+        }
+        .event-section {
+            padding: 2.5rem 2rem;
+        }
+        .accent-bg p, .accent-bg .font-semibold {
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        @media (max-width: 768px) {
+            .minimal-card {
+                border-radius: 1rem;
+            }
+            .minimal-divider {
+                border-right: none;
+                border-bottom: 1.5px solid #424242;
+            }
+            .form-section, .event-section {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden md:flex">
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-3xl mx-auto minimal-card overflow-hidden md:flex" style="position: relative; z-index: 1;">
         
         <!-- Event & Payment QR Section -->
-        <div class="md:w-1/2 p-8 bg-gray-50 flex flex-col justify-center">
-            <h1 class="text-3xl font-bold mb-2 text-gray-800">Starlight Music Festival</h1>
-            <p class="text-lg mb-6 text-gray-600">An unforgettable night under the stars.</p>
+        <div class="md:w-1/2 event-section minimal-bg flex flex-col justify-center minimal-divider">
+            <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #eb0028;">TED</span><sup><span style="color: #eb0028;">x</span></sup><span style="color: #FFFFFF; font-weight: normal;">VIPS</span><span style="color: #eb0028;"> | IGNITED</span></h1>
+            <p class="text-base mb-6 text-gray-400">An unforgettable night under the stars.</p>
             
-            <div class="bg-indigo-600 text-white p-4 rounded-lg mb-6">
-                <p class="font-bold text-center">Scan and Pay to Purchase Your Ticket</p>
-                <p class="text-4xl font-bold text-center my-2">₹700.00</p>
+            <div class="accent-bg p-3 rounded-lg mb-6 text-center">
+                <p class="font-semibold">Scan and Pay to Purchase Your Ticket</p>
+                <p class="text-3xl font-bold my-2 tracking-wide">₹700.00</p>
             </div>
 
-            <img src="https://i.ibb.co/fVVTkMR3/IMG-7839.jpg" alt="Payment QR Code" class="w-full max-w-xs mx-auto rounded-lg shadow-md">
+            <img src="https://i.ibb.co/fVVTkMR3/IMG-7839.jpg" alt="Payment QR Code" class="w-full max-w-xs mx-auto rounded-lg border border-gray-700 shadow-sm">
             <p class="text-xs text-gray-500 mt-4 text-center">After paying, fill out the form with your details.</p>
         </div>
 
         <!-- Purchase Form Section -->
-        <div class="md:w-1/2 p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">1. Fill Your Details</h2>
-            <form method="post" enctype="multipart/form-data" class="space-y-4">
-                {# This security token is required by Django to prevent attacks #}
+        <div class="md:w-1/2 form-section minimal-bg">
+            <h2 class="text-xl font-bold accent mb-6 tracking-tight">1. Fill Your Details</h2>
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
                 
                 <div>
-                    <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <label for="{{ form.full_name.id_for_label }}" class="block text-sm minimal-label">Full Name</label>
                     {{ form.full_name }}
                 </div>
 
                 <div>
-                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm minimal-label">Email Address</label>
                     {{ form.email }}
                 </div>
 
                 <div>
-                    <label for="{{ form.transaction_id.id_for_label }}" class="block text-sm font-medium text-gray-700">Transaction ID</label>
+                    <label for="{{ form.transaction_id.id_for_label }}" class="block text-sm minimal-label">Transaction ID</label>
                     {{ form.transaction_id }}
                 </div>
 
                 <div>
-                    <label for="{{ form.screenshot.id_for_label }}" class="block text-sm font-medium text-gray-700">Payment Screenshot</label>
+                    <label for="{{ form.screenshot.id_for_label }}" class="block text-sm minimal-label">Payment Screenshot</label>
                     {{ form.screenshot }}
                 </div>
 
                 {% if form.errors %}
-                    <div class="p-4 bg-red-100 text-red-700 rounded-lg">
-                        <p class="font-bold">Please correct the errors below:</p>
+                    <div class="error-box">
+                        <p class="font-semibold">Please correct the errors below:</p>
                         <ul class="list-disc list-inside mt-2">
                         {% for field in form %}
                             {% for error in field.errors %}
@@ -64,30 +198,15 @@
                 {% endif %}
 
                 <div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg transition hover:bg-indigo-700 mt-4">
+                    <button type="submit" class="w-full minimal-btn py-3 px-4 mt-4 shadow-sm active:scale-95">
                         Submit For Verification
                     </button>
                 </div>
             </form>
-            <p class="text-center text-sm text-gray-500 mt-4">
-                Already submitted? <a href="{% url 'check_status' %}" class="font-medium text-indigo-600 hover:underline">Check Ticket Status</a>
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Already submitted? <a href="{% url 'check_status' %}" class="font-medium accent hover:underline transition">Check Ticket Status</a>
             </p>
         </div>
     </div>
-
-    <style>
-        /* Add some basic styling to the form fields generated by Django */
-        input[type="text"], input[type="email"], input[type="file"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            margin-top: 0.25rem;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.07);
-        }
-        input[type="file"] {
-            padding: 0.5rem;
-        }
-    </style>
 </body>
 </html>
