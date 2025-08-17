@@ -69,6 +69,11 @@
             backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
             padding: 2.5rem 2rem;
         }
+        @media (max-width: 768px) {
+            .email-display {
+                font-size: 0.8rem !important;
+            }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -97,7 +102,7 @@
 
                                 <div class="text-sm space-y-2 text-gray-300">
                                     <p><strong class="font-semibold text-white">ATTENDEE:</strong> {{ submission.full_name }}</p>
-                                    <p><strong class="font-semibold text-white">EMAIL:</strong> {{ submission.email }}</p>
+                                    <p class="email-display" style="word-break: break-all; overflow-wrap: break-word; font-size:0.95rem;"><strong class="font-semibold text-white">EMAIL:</strong> <span style="word-break: break-all; overflow-wrap: break-word;">{{ submission.email }}</span></p>
                                     <p><strong class="font-semibold text-white">TICKET ID:</strong> <span class="text-red-400 font-bold">{{ submission.ticket_id }}</span></p>
                                     <p><strong class="font-semibold text-white">GATE:</strong> 4A</p>
                                 </div>
@@ -111,6 +116,8 @@
                     <p class="mt-2 text-sm text-gray-400">Our team is reviewing your submission. Please check back later.</p>
                 {% else %}
                     <p class="mt-2 text-sm text-gray-400">There was an issue with your submission. Please contact support for assistance.</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-400">There was an issue with your submission. Please contact support for assistance.</p>
                 {% endif %}
             </div>
         {% else %}
@@ -118,7 +125,12 @@
             <p class="mt-4 text-gray-300">{{ error }}</p>
         {% endif %}
 
-        <a href="{% url 'check_status' %}" class="mt-8 inline-block minimal-btn py-2 px-5">Check another email</a>
+        <div class="mt-8 flex flex-row justify-center gap-4">
+            <a href="{% url 'check_status' %}" class="inline-block minimal-btn py-2 px-5">Check another email</a>
+            {% if submission and (submission.status == 'pending' or submission.status == 'rejected') %}
+                <a href="mailto:tedxvips.tickets@gmail.com" class="inline-block minimal-btn py-2 px-5">Contact Us</a>
+            {% endif %}
+        </div>
     </div>
 
     {% if submission and submission.status == 'approved' %}
