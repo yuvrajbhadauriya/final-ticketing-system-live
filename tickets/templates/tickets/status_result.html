@@ -71,12 +71,20 @@
         }
         @media (max-width: 768px) {
             .email-display {
-                font-size: 0.2rem !important;
+                font-size: 0.3rem !important;
                 word-break: break-all !important;
                 overflow-wrap: break-word !important;
                 max-width: 100vw;
                 white-space: normal !important;
                 display: block;
+            }
+            .status-email {
+                font-size: 1rem !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+                max-width: 100vw;
+                white-space: normal !important;
+                display: inline-block;
             }
         }
     </style>
@@ -84,7 +92,10 @@
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-2xl mx-auto minimal-card text-center" style="position: relative; z-index: 1;">
         {% if submission %}
-            <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #eb0028;">Status for </span><span style="color: #FFFFFF;">{{ submission.email }}</span></h1>
+            <h1 class="text-3xl font-extrabold mb-2 tracking-tight">
+                <span style="color: #eb0028;">Status for </span>
+                <span class="status-email" style="color: #FFFFFF;">{{ submission.email }}</span>
+            </h1>
             <div class="mt-6 p-6 rounded-lg minimal-bg">
                 <p class="text-lg font-medium">Your ticket is currently: 
                     <span class="font-bold 
