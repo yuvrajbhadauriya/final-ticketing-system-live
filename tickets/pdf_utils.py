@@ -48,7 +48,7 @@ def generate_ticket_pdf(submission):
     p.setFont("Helvetica-Bold", 11)
     p.drawString(0.5 * inch, 0.9 * inch, "GATE:")
     p.setFont("Helvetica", 11)
-    p.drawString(1.5 * inch, 0.9 * inch, "4A")
+    p.drawString(1.5 * inch, 0.9 * inch, "1")
 
     # --- Secure QR Code ---
     # Use the secure, random qr_code_id for the QR code's data
