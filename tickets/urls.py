@@ -7,11 +7,12 @@ urlpatterns = [
     path('check-status/', views.check_status_view, name='check_status'),
     path('status-result/', views.status_result_view, name='status_result'),
     path('download-ticket/<int:submission_id>/', views.download_ticket_view, name='download_ticket'),
-
-    # NEW: Ticket Preview URL
     path('preview-ticket/<int:submission_id>/', views.ticket_preview_image_view, name='ticket_preview'),
 
-    path('admin-dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
-    path('approve/<int:submission_id>/', views.approve_submission_view, name='approve_submission'),
-    path('reject/<int:submission_id>/', views.reject_submission_view, name='reject_submission'),
+    # --- Ticket Scanning URLs ---
+    path('scan/', views.scan_ticket_view, name='scan_ticket'),
+    path('api/verify-ticket/', views.verify_ticket_api, name='verify_ticket_api'),
+    path('api/confirm-check-in/', views.confirm_check_in_api, name='confirm_check_in_api'),
+    
+    # The lines that caused the error have been removed from here.
 ]

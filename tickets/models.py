@@ -19,6 +19,7 @@ class Submission(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     ticket_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     email_sent = models.BooleanField(default=False)
+    checked_in = models.BooleanField(default=False) # <--- ADD THIS LINE
 
     # --- NEW: Secure QR Code ID ---
     # This will automatically generate a unique, random ID for every new submission.

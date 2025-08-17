@@ -2,19 +2,35 @@ from django.contrib import admin, messages
 from .models import Submission
 from .pdf_utils import generate_ticket_pdf
 from django.core.mail import EmailMessage
-from import_export.admin import ImportExportModelAdmin # Import the necessary class
+from import_export.admin import ImportExportModelAdmin
 
-# Inherit from ImportExportModelAdmin instead of admin.ModelAdmin
 @admin.register(Submission)
 class SubmissionAdmin(ImportExportModelAdmin):
-    list_display = ('full_name', 'email', 'transaction_id', 'status', 'ticket_id', 'email_sent_status')
-    list_filter = ('status', 'email_sent')
+    # --- ADDED 'transaction_id' back to the display list ---
+    list_display = ('full_name', 'email', 'transaction_id', 'status', 'ticket_id', 'checked_in', 'email_sent_status')
+    
+    list_filter = ('status', 'checked_in', 'email_sent')
     search_fields = ('full_name', 'email', 'ticket_id', 'qr_code_id')
     actions = ['send_ticket_emails']
     list_editable = ('status',)
 
-    # Add qr_code_id to the read-only fields
+    # NOTE: 'checked_in' is now handled dynamically below
     readonly_fields = ('submitted_at', 'updated_at', 'processed_by', 'ticket_id', 'qr_code_id')
+
+    # --- NEW: DYNAMIC READ-ONLY FIELDS LOGIC ---
+    def get_readonly_fields(self, request, obj=None):
+        # Start with the default read-only fields
+        fields = super().get_readonly_fields(request, obj)
+        
+        # If the user is NOT a superuser, make 'checked_in' read-only
+        if not request.user.is_superuser:
+            # Convert tuple to list, add the field, and convert back to tuple
+            fields = list(fields)
+            fields.append('checked_in')
+            return tuple(fields)
+            
+        # Superusers will not have 'checked_in' as read-only
+        return fields
 
     @admin.display(boolean=True, description='Email Sent?')
     def email_sent_status(self, obj):
@@ -22,7 +38,6 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if obj.status == 'approved' and not obj.ticket_id:
-            # Simple way to generate a unique-ish ticket ID
             ticket_id_num = 2500000 + obj.id
             obj.ticket_id = f"TEDxVIPS{ticket_id_num}"
         obj.processed_by = request.user
@@ -30,6 +45,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
     @admin.action(description="Send Ticket Email to Selected")
     def send_ticket_emails(self, request, queryset):
+        # This function remains the same
         approved_submissions = queryset.filter(status='approved', email_sent=False)
         emails_sent = 0
         for submission in approved_submissions:
@@ -43,7 +59,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
                 email = EmailMessage(
                     "Your TEDxVIPS'25 | IGNITED Ticket is Here!",
                     f'Hi {submission.full_name},\n\nYour ticket is attached.\n\nYour Ticket ID is: {submission.ticket_id}',
-                    'your_email@gmail.com', # Make sure to use your actual sender email
+                    'your_email@gmail.com',
                     [submission.email],
                 )
                 email.attach(f'ticket_{submission.ticket_id}.pdf', pdf_buffer.getvalue(), 'application/pdf')

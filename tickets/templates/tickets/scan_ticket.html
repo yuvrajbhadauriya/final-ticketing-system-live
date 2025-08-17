@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #111827; color: white; }
+        #qr-reader { width: 100%; max-width: 500px; margin: auto; border: none; }
+        #result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.8); z-index: 99; }
+        #result-box { padding: 2rem; border-radius: 12px; text-align: center; min-width: 350px; max-width: 90%; }
+        .detail-label { font-size: 0.9rem; color: #9ca3af; text-transform: uppercase; }
+        .detail-value { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold">Event Check-In Scanner</h1>
+        <p class="text-gray-400">Point the camera at a ticket's QR code</p>
+    </div>
+
+    <div id="qr-reader"></div>
+
+    <div id="result-overlay">
+        <div id="result-box" class="bg-gray-800">
+            <h2 id="result-message" class="text-2xl font-bold mb-4"></h2>
+            <div id="attendee-details" class="text-left">
+                <p class="detail-label">Name</p>
+                <p id="result-attendee" class="detail-value"></p>
+                <p class="detail-label">Email</p>
+                <p id="result-email" class="detail-value"></p>
+                <p class="detail-label">Ticket ID</p>
+                <p id="result-ticket-id" class="detail-value"></p>
+            </div>
+            <div id="result-actions" class="mt-6 flex justify-around"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+        // --- Element References ---
+        const resultOverlay = document.getElementById('result-overlay');
+        const resultBox = document.getElementById('result-box');
+        const resultMessage = document.getElementById('result-message');
+        // Detail fields
+        const attendeeDetailsDiv = document.getElementById('attendee-details');
+        const resultAttendee = document.getElementById('result-attendee');
+        const resultEmail = document.getElementById('result-email');
+        const resultTicketId = document.getElementById('result-ticket-id');
+        // Actions
+        const resultActionsDiv = document.getElementById('result-actions');
+
+        let html5QrcodeScanner;
+        let currentQrCodeId = null; // To store the QR ID between verification and confirmation
+
+        // --- Main function to display results in the overlay ---
+        function showResult(data) {
+            resultMessage.textContent = data.message || 'An error occurred.';
+            resultActionsDiv.innerHTML = ''; // Clear previous buttons
+            attendeeDetailsDiv.style.display = 'none'; // Hide details by default
+
+            // Set color and content based on status
+            if (data.status === 'success') { // Verification successful, waiting for confirmation
+                resultBox.className = 'bg-blue-800 text-white p-6 rounded-lg';
+                attendeeDetailsDiv.style.display = 'block';
+                resultAttendee.textContent = data.attendee;
+                resultEmail.textContent = data.email;
+                resultTicketId.textContent = data.ticket_id;
+                
+                // Store the QR code ID
+                currentQrCodeId = data.qr_code_id;
+
+                // Create Confirm and Cancel buttons
+                resultActionsDiv.innerHTML = `
+                    <button onclick="cancelAndResume()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded">Cancel</button>
+                    <button onclick="confirmCheckIn()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">Confirm Check-In</button>
+                `;
+            } else if (data.status === 'warning') {
+                resultBox.className = 'bg-yellow-500 text-white p-6 rounded-lg';
+                attendeeDetailsDiv.style.display = 'block';
+                resultAttendee.textContent = data.attendee;
+                resultEmail.textContent = data.email;
+                resultTicketId.textContent = data.ticket_id;
+                autoHideAndResume(4000); // Show for longer
+            } else if (data.status === 'confirmed') { // Check-in was confirmed
+                resultBox.className = 'bg-green-600 text-white p-6 rounded-lg';
+                attendeeDetailsDiv.style.display = 'block';
+                resultAttendee.textContent = data.attendee;
+                resultEmail.textContent = ''; // Clear details
+                resultTicketId.textContent = '';
+                autoHideAndResume(2500);
+            } else { // Error
+                resultBox.className = 'bg-red-600 text-white p-6 rounded-lg';
+                autoHideAndResume(3000);
+            }
+
+            resultOverlay.style.display = 'flex';
+        }
+        
+        // --- Functions to handle button clicks ---
+        async function confirmCheckIn() {
+            if (!currentQrCodeId) return;
+            resultMessage.textContent = "Confirming...";
+            resultActionsDiv.innerHTML = ''; // Disable buttons
+            
+            const response = await fetch("{% url 'confirm_check_in_api' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qr_code_id: currentQrCodeId }),
+            });
+            const data = await response.json();
+            showResult(data); // Show the final confirmation message
+        }
+
+        function cancelAndResume() {
+            resultOverlay.style.display = 'none';
+            if (html5QrcodeScanner.getState() !== 1) { // 1 = SCANNING
+                 html5QrcodeScanner.resume();
+            }
+        }
+        
+        function autoHideAndResume(delay) {
+            setTimeout(() => {
+                cancelAndResume();
+            }, delay);
+        }
+
+        // --- Initial API call to verify the ticket ---
+        async function verifyQrCode(qrCodeId) {
+            const response = await fetch("{% url 'verify_ticket_api' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qr_code_id: qrCodeId }),
+            });
+            const data = await response.json();
+            showResult(data);
+        }
+
+        // --- Scanner Success Callback ---
+        function onScanSuccess(decodedText, decodedResult) {
+            html5QrcodeScanner.pause();
+            verifyQrCode(decodedText);
+        }
+
+        // --- Start the Scanner ---
+        document.addEventListener('DOMContentLoaded', (event) => {
+            html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 },
+                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+            });
+            html5QrcodeScanner.render(onScanSuccess);
+        });
+    </script>
+</body>
+</html>
