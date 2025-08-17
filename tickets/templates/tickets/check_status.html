@@ -102,6 +102,16 @@
             min-width: 0;
             box-sizing: border-box;
             word-break: break-all;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            white-space: normal;
+            display: block;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 768px) {
+            input[type="email"] {
+                font-size: 0.65rem;
+            }
         }
         @media (max-width: 768px) {
             .minimal-card {
