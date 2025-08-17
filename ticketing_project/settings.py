@@ -8,8 +8,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local
 
 # Production settings
 DEBUG = True
-ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
-CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com']
+ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com', 'tedxvips2025tickets.pythonanywhere.com']
+CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com', 'https://tedxvips2025tickets.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
