@@ -9,3 +9,4 @@ reportlab
 qrcode
 pdf2image
 django-anymail
+django-import-export
