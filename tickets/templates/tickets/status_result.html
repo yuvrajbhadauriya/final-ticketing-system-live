@@ -123,12 +123,7 @@
             <p class="mt-4 text-gray-300">{{ error }}</p>
         {% endif %}
 
-        <div class="mt-8 flex flex-row justify-center gap-4">
-            <a href="{% url 'check_status' %}" class="inline-block minimal-btn py-2 px-5">Check another email</a>
-            {% if submission and (submission.status == 'pending' or submission.status == 'rejected') %}
-                <a href="mailto:tedxvips.tickets@gmail.com" class="inline-block minimal-btn py-2 px-5">Contact Us</a>
-            {% endif %}
-        </div>
+        <a href="{% url 'check_status' %}" class="mt-8 inline-block minimal-btn py-2 px-5">Check another email</a>
     </div>
 
     {% if submission and submission.status == 'approved' %}
