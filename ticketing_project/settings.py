@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local-use')
 
 # Production settings
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com']
 CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com']
 
