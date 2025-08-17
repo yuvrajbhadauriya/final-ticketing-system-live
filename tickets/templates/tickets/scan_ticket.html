@@ -5,8 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Scanner</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TEDx Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #111827; color: white; }
+        body {
+            font-family: 'Roboto', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background-image: url('https://i.ibb.co/27Gj7hWT/tedxbg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #E0E0E0;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        h1, h2, .accent, .accent-bg, .minimal-btn {
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .minimal-bg {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+        }
+        .accent {
+            color: #eb0028;
+        }
+        .accent-bg {
+            background: #eb0028;
+            color: #fff;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.10);
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .minimal-btn {
+            background: #eb0028;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.08);
+            letter-spacing: 0.03em;
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+            border: none;
+            outline: none;
+        }
+        .minimal-btn:hover, .minimal-btn:focus {
+            background: #b80020;
+            box-shadow: 0 4px 16px 0 rgba(235,0,40,0.12);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .minimal-card {
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+            padding: 0;
+        }
+        @media (max-width: 768px) {
+            .minimal-card {
+                border-radius: 1rem;
+            }
+        }
         #qr-reader { width: 100%; max-width: 500px; margin: auto; border: none; }
         #result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.8); z-index: 99; }
         #result-box { padding: 2rem; border-radius: 12px; text-align: center; min-width: 350px; max-width: 90%; }
@@ -14,17 +80,19 @@
         .detail-value { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold">Event Check-In Scanner</h1>
-        <p class="text-gray-400">Point the camera at a ticket's QR code</p>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl mx-auto minimal-card overflow-hidden" style="position: relative; z-index: 1;">
+        <div class="minimal-bg p-8 flex flex-col items-center justify-center">
+            <h1 class="text-3xl font-extrabold mb-2 tracking-tight accent">TED<sup><span style="color: #eb0028;">x</span></sup><span style="color: #FFFFFF; font-weight: normal;">VIPS</span><span style="color: #eb0028;"> | IGNITED</span></h1>
+            <p class="text-base mb-6 text-gray-400">Event Check-In Scanner</p>
+            <div id="qr-reader" class="mb-6"></div>
+            <p class="text-xs text-gray-500 mt-2 text-center">Point the camera at a ticket's QR code to check in.</p>
+        </div>
     </div>
 
-    <div id="qr-reader"></div>
-
     <div id="result-overlay">
-        <div id="result-box" class="bg-gray-800">
+        <div id="result-box" class="minimal-bg">
             <h2 id="result-message" class="text-2xl font-bold mb-4"></h2>
             <div id="attendee-details" class="text-left">
                 <p class="detail-label">Name</p>

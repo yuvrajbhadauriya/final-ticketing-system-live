@@ -95,6 +95,23 @@
             background: rgba(30, 30, 30, 0.8);
             backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
             padding: 2.5rem 2rem;
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+        }
+        input[type="email"] {
+            min-width: 0;
+            box-sizing: border-box;
+            word-break: break-all;
+        }
+        @media (max-width: 768px) {
+            .minimal-card {
+                border-radius: 1rem;
+                padding: 1.5rem 1rem;
+            }
+            input[type="email"] {
+                font-size: 1rem;
+                padding: 0.85rem 0.8rem;
+            }
         }
     </style>
 </head>
