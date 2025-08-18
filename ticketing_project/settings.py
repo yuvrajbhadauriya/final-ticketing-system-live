@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local
 
 # Production settings
 DEBUG = True
-ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com', 'tedxvips2025tickets.pythonanywhere.com']
+ALLOWED_HOSTS = ['yuvrajbhadauriya.pythonanywhere.com', 'tedxvips2025tickets.pythonanywhere.com', "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://yuvrajbhadauriya.pythonanywhere.com', 'https://tedxvips2025tickets.pythonanywhere.com']
 
 INSTALLED_APPS = [

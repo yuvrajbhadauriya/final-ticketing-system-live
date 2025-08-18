@@ -8,24 +8,29 @@ class Submission(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
+    
+    TICKET_TYPE_CHOICES = [
+        ('vips', 'VIPS Student'),
+        ('outsider', 'Outsider'),
+    ]
+    
+    PASS_TYPE_CHOICES = [
+        ('day1', 'Day 1 Pass'),
+        ('combo', 'Combo Pass'),
+    ]
 
-    # --- Customer and Transaction Details ---
+    attendee_type = models.CharField(max_length=10, choices=TICKET_TYPE_CHOICES, default='outsider')
+    vips_id_card = models.ImageField(upload_to='vips_ids/', blank=True, null=True)
+    pass_type = models.CharField(max_length=10, choices=PASS_TYPE_CHOICES, default='day1')
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     transaction_id = models.CharField(max_length=255)
-    screenshot = models.ImageField(upload_to='screenshots/')
-
-    # --- Admin and Status Tracking ---
+    screenshot = models.ImageField(upload_to='screenshots/', blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     ticket_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     email_sent = models.BooleanField(default=False)
-    checked_in = models.BooleanField(default=False) # <--- ADD THIS LINE
-
-    # --- NEW: Secure QR Code ID ---
-    # This will automatically generate a unique, random ID for every new submission.
+    checked_in = models.BooleanField(default=False)
     qr_code_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-
-    # --- Timestamps and Auditing ---
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     processed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='processed_submissions')
@@ -36,3 +41,8 @@ class Submission(models.Model):
 
     class Meta:
         ordering = ['-submitted_at']
+        permissions = [
+            ("can_edit_kiosk_submission", "Can edit kiosk submission details"),
+            # --- NEW: Permission for status fields ---
+            ("can_change_status_fields", "Can change email sent and checked in status"),
+        ]

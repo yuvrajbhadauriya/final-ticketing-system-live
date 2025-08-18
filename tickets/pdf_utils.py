@@ -32,26 +32,36 @@ def generate_ticket_pdf(submission):
     # --- Attendee Details ---
     p.setFillColorRGB(0.9, 0.9, 0.9)
     p.setFont("Helvetica-Bold", 11)
-    p.drawString(0.5 * inch, 1.8 * inch, "ATTENDEE:")
+    p.drawString(0.5 * inch, 2.1 * inch, "ATTENDEE:")
     p.setFont("Helvetica", 11)
-    p.drawString(1.5 * inch, 1.8 * inch, submission.full_name)
+    p.drawString(1.7 * inch, 2.1 * inch, submission.full_name)
+    
     p.setFont("Helvetica-Bold", 11)
-    p.drawString(0.5 * inch, 1.5 * inch, "EMAIL:")
+    p.drawString(0.5 * inch, 1.8 * inch, "EMAIL:")
     p.setFont("Helvetica", 11)
-    p.drawString(1.5 * inch, 1.5 * inch, submission.email)
+    p.drawString(1.7 * inch, 1.8 * inch, submission.email)
+
+    # --- Attendee Type ---
+    p.setFont("Helvetica-Bold", 11)
+    p.drawString(0.5 * inch, 1.5 * inch, "TICKET TYPE:")
+    p.setFont("Helvetica", 11)
+    # This gets the display name (e.g., "VIPS Student") from the model's choices
+    p.drawString(1.7 * inch, 1.5 * inch, submission.get_attendee_type_display())
+
     p.setFont("Helvetica-Bold", 11)
     p.drawString(0.5 * inch, 1.2 * inch, "TICKET ID:")
     p.setFont("Helvetica-Bold", 12)
     p.setFillColor(tedx_red)
-    p.drawString(1.5 * inch, 1.2 * inch, submission.ticket_id) # Human-readable ID
+    p.drawString(1.7 * inch, 1.2 * inch, submission.ticket_id)
+    
     p.setFillColorRGB(0.9, 0.9, 0.9)
     p.setFont("Helvetica-Bold", 11)
-    p.drawString(0.5 * inch, 0.9 * inch, "GATE:")
+    p.drawString(0.5 * inch, 0.9 * inch, "GATE INFO:")
     p.setFont("Helvetica", 11)
-    p.drawString(1.5 * inch, 0.9 * inch, "1")
+    # --- Updated Gate Information ---
+    p.drawString(1.7 * inch, 0.9 * inch, "Gate 1 (Boys)  |  Gate 3 (Girls)")
 
     # --- Secure QR Code ---
-    # Use the secure, random qr_code_id for the QR code's data
     qr_code_data = str(submission.qr_code_id)
     qr_code = qr.QrCodeWidget(qr_code_data, barFillColor=tedx_red)
     bounds = qr_code.getBounds()

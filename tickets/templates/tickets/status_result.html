@@ -119,8 +119,14 @@
                                 <div class="text-sm space-y-2 text-gray-300">
                                     <p><strong class="font-semibold text-white">ATTENDEE:</strong> {{ submission.full_name }}</p>
                                     <p class="email-display" style="word-break: break-all; overflow-wrap: break-word; font-size:0.95rem;"><strong class="font-semibold text-white">EMAIL:</strong> <span style="word-break: break-all; overflow-wrap: break-word;">{{ submission.email }}</span></p>
+                                    
+                                    <!-- NEW: Attendee Type -->
+                                    <p><strong class="font-semibold text-white">TICKET TYPE:</strong> {{ submission.get_attendee_type_display }}</p>
+
                                     <p><strong class="font-semibold text-white">TICKET ID:</strong> <span class="text-red-400 font-bold">{{ submission.ticket_id }}</span></p>
-                                    <p><strong class="font-semibold text-white">GATE:</strong> 1</p>
+                                    
+                                    <!-- CHANGE: Updated Gate Information -->
+                                    <p><strong class="font-semibold text-white">GATE INFO:</strong> Gate 1 (Boys) | Gate 3 (Girls)</p>
                                 </div>
                             </div>
                             <div id="qrcode-preview" class="bg-white p-2 rounded-md flex-shrink-0"></div>
@@ -132,6 +138,11 @@
                     <p class="mt-2 text-sm text-gray-400">Our team is reviewing your submission. Please check back later.</p>
                 {% else %}
                     <p class="mt-2 text-sm text-gray-400">There was an issue with your submission. Please contact support for assistance.</p>
+                    <!-- NEW: Contact Support Button for Rejected Tickets -->
+                     <a href="mailto:TEDxVIPS.tickets@gmail.com?subject=My%20submission%20is%20rejected&body=Hello,%0A%0AI%20am%20writing%20to%20inquire%20about%20my%20ticket%20submission.%20My%20registered%20email%20is%20{{ submission.email }}.%0A%0AThank%20you."
+                       class="mt-4 inline-block minimal-btn py-2 px-5">
+                      Contact Support
+                    </a>
                 {% endif %}
             </div>
         {% else %}

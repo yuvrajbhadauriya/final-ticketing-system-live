@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGNITED | TEDxVIPS 2025 Tickets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #000000;
+            color: white;
+            background-image: url('https://i.ibb.co/27Gj7hWT/tedxbg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.9); /* Changed from 0.8 to 0.9 for darker background */
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(255, 255, 255, 0.15); /* Added thicker and slightly more visible border */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Added subtle shadow for depth */
+        }
+        .highlight {
+            color: #E62B1E; /* TED Red */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="container w-full max-w-3xl p-8 text-center rounded-xl shadow-2xl">
+        <h1 class="text-4xl font-extrabold md:text-6xl tracking-tight">
+            <span style="color: #eb0028;">IGNITED</span>
+            <span style="color: #FFFFFF; font-weight: normal;"> by </span>
+            <span style="color: #eb0028;">TED</span><sup><span style="color: #eb0028;">x</span></sup><span style="color: #FFFFFF; font-weight: normal;">VIPS</span>
+        </h1>
+        <p class="mt-2 text-lg font-semibold tracking-wider text-gray-300">14 SEPTEMBER 2025 | 4 PM ONWARDS</p>
+        
+        <div class="my-6">
+            <p class="px-4 py-2 text-xl font-bold text-yellow-300 border-2 border-yellow-300 rounded-lg inline-block">
+                EARLY BIRD PASSES
+            </p>
+            <p class="mt-2 text-sm font-medium text-yellow-400">ONLY 50 PASSES AVAILABLE!</p>
+        </div>
+
+        <p class="max-w-xl mx-auto mt-4 text-gray-300">
+            We assure you are going to have the best time. Choose your ticket type below to begin.
+        </p>
+
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <!-- VIPS Student Button -->
+            <a href="{% url 'vips_submission' %}" class="block px-6 py-4 font-bold text-white transition-transform transform bg-red-600 rounded-lg shadow-md hover:bg-red-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <span class="text-xl">VIPS Student Ticket</span>
+                <span class="block text-sm font-normal text-red-200">Early Bird Day 1@ ₹399 & Combo @ ₹1199</span>
+            </a>
+
+            <!-- Outsider Button -->
+            <a href="{% url 'outsider_submission' %}" class="block px-6 py-4 font-bold text-white transition-transform transform bg-gray-700 rounded-lg shadow-md hover:bg-gray-600 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <span class="text-xl">Outsider Ticket</span>
+                <span class="block text-sm font-normal text-gray-300">Early Bird @ ₹499 & Combo @ ₹1399</span>
+            </a>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div class="mt-8 text-xs text-left text-gray-400 border-t border-gray-700 pt-4">
+            <h3 class="font-bold text-sm text-white mb-2">Important Information:</h3>
+            <ul class="space-y-1 list-disc list-inside">
+                <li>Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.</li>
+                <li>Each ticket contains a unique QR code and will be scanned only once for entry.</li>
+                <li>Re-entry or second scans will not be permitted.</li>
+            </ul>
+        </div>
+        
+        <div class="mt-6">
+            For queries or issues: <a href="https://wa.me/916398979052?text=Hello,%20I%20have%20some%20query/issue%20related%20to%20tickets%20for%20IGNITED'25" class="font-bold accent hover:underline transition" style="color: #eb0028;">Contact Us</a> | 
+            Already submitted? <a href="{% url 'check_status' %}" class="font-bold accent hover:underline transition" style="color: #eb0028;">Check Ticket Status</a>
+        </div>
+    </div>
+
+</body>
+</html>

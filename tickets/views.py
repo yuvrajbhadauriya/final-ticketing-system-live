@@ -7,34 +7,57 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import Submission
-from .forms import SubmissionForm
+# --- CHANGE: Import the two new forms instead of the old one ---
+from .forms import VipsSubmissionForm, OutsiderSubmissionForm
 from .pdf_utils import generate_ticket_pdf
 from pdf2image import convert_from_bytes
 from io import BytesIO
-import json # Import for handling JSON data
+import json
 
-# --- Customer Facing Views ---
-# (These views remain the same)
-def submission_form_view(request):
+# --- NEW: Main Homepage View ---
+def home_view(request):
+    """
+    Displays the main landing page with the two ticket options.
+    """
+    return render(request, 'tickets/home.html')
+
+# --- NEW: VIPS Student Submission Form View ---
+def vips_submission_view(request):
     if request.method == 'POST':
-        form = SubmissionForm(request.POST, request.FILES)
+        form = VipsSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            submission = form.save(commit=False)
+            submission.attendee_type = 'vips' # Set the attendee type
+            submission.save()
             return redirect('submission_success')
     else:
-        form = SubmissionForm()
-    return render(request, 'tickets/submission_form.html', {'form': form})
+        form = VipsSubmissionForm()
+    # We'll create this new template file in a later step
+    return render(request, 'tickets/vips_submission_form.html', {'form': form})
+
+# --- NEW: Outsider Submission Form View ---
+def outsider_submission_view(request):
+    if request.method == 'POST':
+        form = OutsiderSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            submission.attendee_type = 'outsider' # Set the attendee type
+            submission.save()
+            return redirect('submission_success')
+    else:
+        form = OutsiderSubmissionForm()
+    # We'll reuse the old template and rename it
+    return render(request, 'tickets/outsider_submission_form.html', {'form': form})
+
 
 def submission_success_view(request):
     return render(request, 'tickets/submission_success.html')
 
-# --- Ticket Status Views ---
-# (These views remain the same)
+# --- Ticket Status Views (No changes needed) ---
 def check_status_view(request):
     return render(request, 'tickets/check_status.html')
 
 def status_result_view(request):
-    # ... (code remains the same) ...
     email = request.POST.get('email', None)
     submission = None
     error = None
@@ -47,10 +70,8 @@ def status_result_view(request):
         return redirect('check_status')
     return render(request, 'tickets/status_result.html', {'submission': submission, 'error': error})
 
-# --- Ticket Download and Preview Views ---
-# (These views remain the same)
+# --- Ticket Download and Preview Views (No changes needed) ---
 def download_ticket_view(request, submission_id):
-    # ... (code remains the same) ...
     submission = get_object_or_404(Submission, id=submission_id, status='approved')
     pdf_buffer = generate_ticket_pdf(submission)
     response = HttpResponse(pdf_buffer, content_type='application/pdf')
@@ -58,7 +79,6 @@ def download_ticket_view(request, submission_id):
     return response
 
 def ticket_preview_image_view(request, submission_id):
-    # ... (code remains the same) ...
     submission = get_object_or_404(Submission, id=submission_id, status='approved')
     pdf_buffer = generate_ticket_pdf(submission)
     images = convert_from_bytes(pdf_buffer.read(), first_page=1, last_page=1)
@@ -68,38 +88,21 @@ def ticket_preview_image_view(request, submission_id):
     img_buffer.seek(0)
     return HttpResponse(img_buffer, content_type='image/png')
 
-
-# --- Admin Facing Views ---
-# (These views remain the same)
-def admin_dashboard_view(request):
-    # ... (code remains the same) ...
-    submissions = Submission.objects.all()
-    return render(request, 'tickets/admin_dashboard.html', {'submissions': submissions})
-
-# --- TICKET SCANNING AND VERIFICATION VIEWS ---
-# --------------------------------------------------
-
+# --- TICKET SCANNING AND VERIFICATION VIEWS (No changes needed) ---
 @login_required
 def scan_ticket_view(request):
     return render(request, 'tickets/scan_ticket.html')
 
-
 @csrf_exempt
 @login_required
 def verify_ticket_api(request):
-    """
-    MODIFIED: This view now ONLY verifies the ticket and returns its details.
-    It does NOT automatically check the person in.
-    """
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             qr_code_id = data.get('qr_code_id')
             submission = Submission.objects.get(qr_code_id=qr_code_id)
-
             if submission.status != 'approved':
                 return JsonResponse({'status': 'error', 'message': 'Ticket Not Approved'})
-
             if submission.checked_in:
                 return JsonResponse({
                     'status': 'warning',
@@ -108,55 +111,39 @@ def verify_ticket_api(request):
                     'email': submission.email,
                     'ticket_id': submission.ticket_id
                 })
-
-            # --- CHANGE ---
-            # If all checks pass, just return the ticket details for confirmation.
             return JsonResponse({
                 'status': 'success',
                 'message': 'Valid Ticket Found!',
                 'attendee': submission.full_name,
                 'email': submission.email,
                 'ticket_id': submission.ticket_id,
-                'qr_code_id': submission.qr_code_id # Pass this back to use for confirmation
+                'qr_code_id': submission.qr_code_id
             })
-
         except Submission.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invalid Ticket Code'})
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred.'})
-
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
-
-# --- NEW FUNCTION ---
 @csrf_exempt
 @login_required
 def confirm_check_in_api(request):
-    """
-    NEW: This view handles the final check-in after the staff confirms it.
-    """
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             qr_code_id = data.get('qr_code_id')
             submission = Submission.objects.get(qr_code_id=qr_code_id)
-            
-            # Final checks before marking as checked in
             if submission.status != 'approved' or submission.checked_in:
                 return JsonResponse({'status': 'error', 'message': 'Ticket cannot be checked in.'}, status=400)
-
             submission.checked_in = True
             submission.save()
-            
             return JsonResponse({
-                'status': 'confirmed', 
+                'status': 'confirmed',
                 'message': 'Check-In Confirmed!',
                 'attendee': submission.full_name
             })
-
         except Submission.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invalid Ticket Code'})
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred.'})
-            
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
