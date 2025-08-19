@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Status</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- TEDx Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -107,38 +106,35 @@
                 </p>
 
                 {% if submission.status == 'approved' %}
-                    <p class="mt-2 text-sm text-gray-400">Congratulations! Your ticket is ready. You can use the preview below or download the official PDF.</p>
+                    <!-- UPDATED MESSAGE -->
+                    <p class="mt-4 text-sm text-gray-300">
+                        Congratulations! You will receive your official IGNITED Pass via email within 48 hours if you haven't received it already.
+                    </p>
 
                     <div class="my-6 text-left">
-                        <h2 class="text-lg font-semibold mb-2 text-center text-white">Ticket Preview</h2>
-                        <div class="bg-gray-900 text-white rounded-lg shadow-md p-6 flex flex-col sm:flex-row gap-6 items-center">
-                            <div class="flex-grow">
-                                <h3 class="text-3xl font-bold text-red-500">TEDxVIPS'25</h3>
-                                <p class="text-xl font-semibold text-red-400 mb-4">| IGNITED</p>
+                        <h2 class="text-lg font-semibold mb-2 text-center text-white">Ticket Confirmation</h2>
+                        <!-- UPDATED PREVIEW (NO QR CODE) -->
+                        <div class="bg-gray-900 text-white rounded-lg shadow-md p-6">
+                            <h3 class="text-3xl font-bold text-red-500">TEDxVIPS'25</h3>
+                            <p class="text-xl font-semibold text-red-400 mb-4">| IGNITED</p>
 
-                                <div class="text-sm space-y-2 text-gray-300">
-                                    <p><strong class="font-semibold text-white">ATTENDEE:</strong> {{ submission.full_name }}</p>
-                                    <p class="email-display" style="word-break: break-all; overflow-wrap: break-word; font-size:0.95rem;"><strong class="font-semibold text-white">EMAIL:</strong> <span style="word-break: break-all; overflow-wrap: break-word;">{{ submission.email }}</span></p>
-                                    
-                                    <!-- NEW: Attendee Type -->
-                                    <p><strong class="font-semibold text-white">TICKET TYPE:</strong> {{ submission.get_attendee_type_display }}</p>
-
-                                    <p><strong class="font-semibold text-white">TICKET ID:</strong> <span class="text-red-400 font-bold">{{ submission.ticket_id }}</span></p>
-                                    
-                                    <!-- CHANGE: Updated Gate Information -->
-                                    <p><strong class="font-semibold text-white">GATE INFO:</strong> Gate 1 (Boys) | Gate 3 (Girls)</p>
-                                </div>
+                            <div class="text-sm space-y-2 text-gray-300">
+                                <p><strong class="font-semibold text-white">ATTENDEE:</strong> {{ submission.full_name }}</p>
+                                <p class="email-display" style="word-break: break-all; overflow-wrap: break-word; font-size:0.95rem;"><strong class="font-semibold text-white">EMAIL:</strong> <span style="word-break: break-all; overflow-wrap: break-word;">{{ submission.email }}</span></p>
+                                <p><strong class="font-semibold text-white">TICKET TYPE:</strong> {{ submission.get_attendee_type_display }}</p>
+                                <p><strong class="font-semibold text-white">PASS TYPE:</strong> {{ submission.get_pass_type_display }}</p>
+                                <p><strong class="font-semibold text-white">TICKET ID:</strong> <span class="text-red-400 font-bold">{{ submission.ticket_id }}</span></p>
+                                <p><strong class="font-semibold text-white">GATE INFO:</strong> Gate 1 (Boys) | Gate 3 (Girls)</p>
                             </div>
-                            <div id="qrcode-preview" class="bg-white p-2 rounded-md flex-shrink-0"></div>
                         </div>
                     </div>
 
-                    <a href="{% url 'download_ticket' submission.id %}" class="mt-4 inline-block minimal-btn py-2 px-5">Download Your Ticket (PDF)</a>
+                    <!-- DOWNLOAD BUTTON REMOVED -->
+
                 {% elif submission.status == 'pending' %}
                     <p class="mt-2 text-sm text-gray-400">Our team is reviewing your submission. Please check back later.</p>
                 {% else %}
                     <p class="mt-2 text-sm text-gray-400">There was an issue with your submission. Please contact support for assistance.</p>
-                    <!-- NEW: Contact Support Button for Rejected Tickets -->
                      <a href="mailto:TEDxVIPS.tickets@gmail.com?subject=My%20submission%20is%20rejected&body=Hello,%0A%0AI%20am%20writing%20to%20inquire%20about%20my%20ticket%20submission.%20My%20registered%20email%20is%20{{ submission.email }}.%0A%0AThank%20you."
                        class="mt-4 inline-block minimal-btn py-2 px-5">
                       Contact Support
@@ -153,18 +149,5 @@
         <a href="{% url 'check_status' %}" class="mt-8 inline-block minimal-btn py-2 px-5">Check another email</a>
     </div>
 
-    {% if submission and submission.status == 'approved' %}
-    <script>
-        // Use the secure qr_code_id for the preview QR code's data
-        new QRCode(document.getElementById("qrcode-preview"), {
-            text: "{{ submission.qr_code_id }}",
-            width: 128,
-            height: 128,
-            colorDark : "#e62b1e",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
-    </script>
-    {% endif %}
 </body>
 </html>
