@@ -43,6 +43,25 @@ class Submission(models.Model):
         ordering = ['-submitted_at']
         permissions = [
             ("can_edit_kiosk_submission", "Can edit kiosk submission details"),
-            # --- NEW: Permission for status fields ---
             ("can_change_status_fields", "Can change email sent and checked in status"),
         ]
+
+# --- NEW: Kiosk Request Model ---
+# This model will store temporary requests from the kiosk customer form.
+class KioskRequest(models.Model):
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    attendee_type = models.CharField(max_length=10, choices=Submission.TICKET_TYPE_CHOICES)
+    pass_type = models.CharField(max_length=10, choices=Submission.PASS_TYPE_CHOICES)
+    cash_amount = models.IntegerField()
+    
+    # This links the request to a specific staff member
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='kiosk_requests')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Request from {self.full_name} for {self.assigned_to.username}"
+
+    class Meta:
+        ordering = ['-created_at']

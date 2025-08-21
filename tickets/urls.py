@@ -2,14 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # --- CHANGE: The main page is now the home view ---
+    # --- Main Site URLs ---
     path('', views.home_view, name='home'),
-
-    # --- NEW: URLs for the two separate submission forms ---
     path('submit/vips/', views.vips_submission_view, name='vips_submission'),
     path('submit/outsider/', views.outsider_submission_view, name='outsider_submission'),
-
-    # --- Other URLs remain the same ---
     path('success/', views.submission_success_view, name='submission_success'),
     path('check-status/', views.check_status_view, name='check_status'),
     path('status-result/', views.status_result_view, name='status_result'),
@@ -20,4 +16,12 @@ urlpatterns = [
     path('scan/', views.scan_ticket_view, name='scan_ticket'),
     path('api/verify-ticket/', views.verify_ticket_api, name='verify_ticket_api'),
     path('api/confirm-check-in/', views.confirm_check_in_api, name='confirm_check_in_api'),
+
+    # --- Kiosk Workflow URLs ---
+    path('kiosk/request/', views.kiosk_request_view, name='kiosk_request'),
+    path('kiosk/success/', views.kiosk_request_success_view, name='kiosk_request_success'),
+    path('kiosk/dashboard/', views.kiosk_staff_dashboard_view, name='kiosk_staff_dashboard'),
+    path('kiosk/accept/<int:request_id>/', views.accept_kiosk_request_view, name='accept_kiosk_request'),
+    # --- ADD THIS NEW LINE ---
+    path('kiosk/reject/<int:request_id>/', views.reject_kiosk_request_view, name='reject_kiosk_request'),
 ]

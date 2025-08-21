@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Submitted</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TEDx Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background-image: url('https://i.ibb.co/27Gj7hWT/tedxbg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #E0E0E0;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        h1, h2, .accent, .accent-bg, .minimal-btn {
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .minimal-bg {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+        }
+        .accent {
+            color: #eb0028;
+        }
+        .minimal-btn {
+            background: #eb0028;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(235,0,40,0.08);
+            letter-spacing: 0.03em;
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+            border: none;
+            outline: none;
+        }
+        .minimal-btn:hover, .minimal-btn:focus {
+            background: #b80020;
+            box-shadow: 0 4px 16px 0 rgba(235,0,40,0.12);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .minimal-card {
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
+            padding: 2.5rem 2rem;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl mx-auto minimal-card text-center" style="position: relative; z-index: 1;">
+        <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #FFFFFF;">Request Sent!</span></h1>
+        <div class="mt-6 p-6 rounded-lg minimal-bg">
+            <p class="text-lg font-medium">
+                Your request has been sent to the kiosk team member for confirmation.
+            </p>
+            <p class="mt-2 text-sm text-gray-400">
+                Once they accept it, your submission will be added to the main system for final approval by a manager. Thank you!
+            </p>
+        </div>
+        <div class="mt-8">
+            <a href="{% url 'kiosk_request' %}" class="w-full sm:w-auto inline-block minimal-btn py-3 px-6">
+                Submit Another Request
+            </a>
+        </div>
+    </div>
+</body>
+</html>

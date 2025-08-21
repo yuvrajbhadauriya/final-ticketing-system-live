@@ -1,33 +1,34 @@
 from django import forms
-from .models import Submission
+from .models import Submission, KioskRequest
+from django.contrib.auth.models import User
 
 class VipsSubmissionForm(forms.ModelForm):
-    """
-    A dedicated form for VIPS Student submissions.
-    This form includes the required VIPS ID card upload.
-    """
     class Meta:
         model = Submission
-        # --- ADD 'pass_type' to the fields list ---
         fields = ['full_name', 'email', 'pass_type', 'transaction_id', 'vips_id_card', 'screenshot']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make these fields required on the public form
         self.fields['vips_id_card'].required = True
         self.fields['screenshot'].required = True
 
 class OutsiderSubmissionForm(forms.ModelForm):
-    """
-    A dedicated form for Outsider submissions.
-    This form does NOT include the VIPS ID card field.
-    """
     class Meta:
         model = Submission
-        # --- ADD 'pass_type' to the fields list ---
         fields = ['full_name', 'email', 'pass_type', 'transaction_id', 'screenshot']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make this field required on the public form
         self.fields['screenshot'].required = True
+
+class KioskRequestForm(forms.ModelForm):
+    class Meta:
+        model = KioskRequest
+        fields = ['full_name', 'email', 'attendee_type', 'pass_type', 'cash_amount', 'assigned_to']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # --- THIS IS THE FIX ---
+        # Only show users who are in the "Kiosk Team" group
+        self.fields['assigned_to'].queryset = User.objects.filter(groups__name='Kiosk Team')
+        self.fields['assigned_to'].label = "Kiosk Team Member"

@@ -7,14 +7,18 @@ from django.utils.html import format_html # Import for displaying images
 
 @admin.register(Submission)
 class SubmissionAdmin(ImportExportModelAdmin):
+    # --- UPDATED: Added pass_type and transaction_id to the display list ---
     list_display = ('full_name', 'email', 'attendee_type', 'pass_type', 'transaction_id', 'ticket_id', 'status', 'email_sent', 'checked_in')
     
+    # --- UPDATED: Added pass_type to the filters ---
     list_filter = ('status', 'attendee_type', 'pass_type', 'checked_in', 'email_sent')
     
     search_fields = ('full_name', 'email', 'ticket_id', 'transaction_id')
     actions = ['send_ticket_emails']
+    # This makes the 'status' field an editable dropdown in the list view
     list_editable = ('status',)
 
+    # Base readonly fields for all users
     readonly_fields = (
         'submitted_at', 'updated_at', 'processed_by', 'ticket_id', 
         'qr_code_id', 'vips_id_card_preview', 'screenshot_preview'
@@ -22,6 +26,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
     fieldsets = (
         ('Submission Details', {
+            # --- UPDATED: Added pass_type to the details view ---
             'fields': ('full_name', 'email', 'attendee_type', 'pass_type', 'transaction_id')
         }),
         ('Verification Images', {
@@ -50,15 +55,9 @@ class SubmissionAdmin(ImportExportModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         fields = list(super().get_readonly_fields(request, obj))
         
-        # Check for the two custom permissions
-        can_edit_details = request.user.has_perm('tickets.can_edit_kiosk_submission')
-        can_edit_status_fields = request.user.has_perm('tickets.can_change_status_fields')
+        can_edit_details = request.user.has_perm('tickets.can_edit_kiosk_submission') or request.user.is_superuser
+        can_edit_status_fields = request.user.has_perm('tickets.can_change_status_fields') or request.user.is_superuser
 
-        # If the user is a superuser, they can edit everything
-        if request.user.is_superuser:
-            return fields
-
-        # If they are not a superuser, apply restrictions
         if not can_edit_details:
             fields.extend([
                 'full_name', 
@@ -74,11 +73,16 @@ class SubmissionAdmin(ImportExportModelAdmin):
         return tuple(fields)
 
     def save_model(self, request, obj, form, change):
-        if obj.status == 'approved' and not obj.ticket_id:
-            ticket_id_num = 2500000 + obj.id
-            obj.ticket_id = f"TEDxVIPS{ticket_id_num}"
+        # --- FIX: Save the object to the database FIRST ---
+        # This generates the obj.id needed for the ticket_id
         obj.processed_by = request.user
         super().save_model(request, obj, form, change)
+
+        # --- Now, generate the ticket_id if needed ---
+        if obj.status == 'approved' and not obj.ticket_id:
+            ticket_id_num = 2500000 + obj.id # obj.id now exists
+            obj.ticket_id = f"TEDxVIPS{ticket_id_num}"
+            obj.save() # Save the object again to store the new ticket_id
 
     @admin.action(description="Send Ticket Email to Selected")
     def send_ticket_emails(self, request, queryset):
@@ -92,7 +96,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
             pdf_buffer = generate_ticket_pdf(submission)
             
             try:
-                subject = "TICKET FOR IGNITED 2025"
+                subject = "CONGRATS FOR SECURING YOUR PASS FOR IGNITED 2025"
                 from_email = 'your_email@gmail.com' # Make sure to use your actual sender email
                 to = [submission.email]
 
@@ -106,6 +110,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
                 
                 Important Information:
                 - Your ticket will be downloadable on the "Check Ticket Status" page.
+                - A wristband will be provided to you on the day of the event.
                 - Each ticket contains a unique QR code and will be scanned only once for entry.
                 - Re-entry or second scans will not be permitted.
                 

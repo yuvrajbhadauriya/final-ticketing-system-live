@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk Staff Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TEDx Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            color: #E0E0E0;
+        }
+        h1, h2, .accent, .accent-bg, .btn {
+            font-family: 'Montserrat', 'Roboto', 'Arial', sans-serif;
+        }
+        .accent {
+            color: #eb0028;
+        }
+        .btn {
+            font-weight: 700;
+            border-radius: 0.5rem;
+            transition: background 0.2s, transform 0.1s, opacity 0.2s;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: #fff;
+        }
+        .btn:disabled {
+            background-color: #4b5563; /* bg-gray-600 */
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .btn-accept {
+            background: #22c55e; /* bg-green-500 */
+        }
+        .btn-accept:hover:not(:disabled) {
+            background: #16a34a; /* bg-green-600 */
+            transform: translateY(-1px);
+        }
+        .btn-reject {
+            background: #ef4444; /* bg-red-500 */
+        }
+        .btn-reject:hover:not(:disabled) {
+            background: #dc2626; /* bg-red-600 */
+            transform: translateY(-1px);
+        }
+        .table-header {
+            background-color: #374151; /* bg-gray-700 */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="w-full max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-extrabold tracking-tight" style="color: #FFFFFF;">Kiosk Dashboard</h1>
+            <a href="/admin/logout/" class="text-sm text-gray-400 hover:text-white">Logout</a>
+        </div>
+        
+        <!-- NEW: Message Display Area -->
+        {% if messages %}
+            <div class="mb-4 space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-md text-white font-medium
+                        {% if message.tags == 'success' %} bg-green-500 
+                        {% elif message.tags == 'warning' %} bg-yellow-500 
+                        {% elif message.tags == 'info' %} bg-blue-500
+                        {% else %} bg-red-500 {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <p class="mb-6 text-gray-300">
+            Welcome, {{ request.user.username }}. Below are the kiosk requests assigned to you. Please review and accept them to create a pending submission.
+        </p>
+
+        <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="table-header">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 font-medium">Customer Name</th>
+                            <th scope="col" class="px-6 py-3 font-medium">Email</th>
+                            <th scope="col" class="px-6 py-3 font-medium">Attendee Type</th>
+                            <th scope="col" class="px-6 py-3 font-medium">Pass Type</th>
+                            <th scope="col" class="px-6 py-3 font-medium">Cash Amount (₹)</th>
+                            <th scope="col" class="px-6 py-3 font-medium text-center">Time Left</th>
+                            <th scope="col" class="px-6 py-3 font-medium text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50" id="row-{{ req.id }}">
+                            <td class="px-6 py-4 font-medium">{{ req.full_name }}</td>
+                            <td class="px-6 py-4">{{ req.email }}</td>
+                            <td class="px-6 py-4">{{ req.get_attendee_type_display }}</td>
+                            <td class="px-6 py-4">{{ req.get_pass_type_display }}</td>
+                            <td class="px-6 py-4 font-semibold">{{ req.cash_amount }}</td>
+                            <td class="px-6 py-4 font-mono text-center" data-created-at="{{ req.created_at.isoformat }}" id="timer-{{ req.id }}">01:00</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <a href="{% url 'accept_kiosk_request' req.id %}" class="btn btn-accept">
+                                        Accept
+                                    </a>
+                                    <a href="{% url 'reject_kiosk_request' req.id %}" class="btn btn-reject">
+                                        Reject
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-400">
+                                You have no pending kiosk requests.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timers = document.querySelectorAll('[data-created-at]');
+            
+            timers.forEach(timerEl => {
+                const createdAt = new Date(timerEl.dataset.createdAt);
+                const expiryTime = createdAt.getTime() + 60000; // 60 seconds
+                const row = document.getElementById(`row-${timerEl.id.split('-')[1]}`);
+                const buttons = row.querySelectorAll('.btn');
+
+                const interval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const timeLeft = Math.round((expiryTime - now) / 1000);
+
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        timerEl.textContent = 'Expired';
+                        timerEl.classList.add('text-red-500', 'font-bold');
+                        buttons.forEach(btn => {
+                            btn.setAttribute('disabled', true);
+                            btn.style.pointerEvents = 'none'; // Prevent clicks
+                        });
+                        // --- NEW: Hide the row after a short delay ---
+                        setTimeout(() => {
+                            row.style.display = 'none';
+                        }, 2000); // Wait 2 seconds before hiding
+                    } else {
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    }
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
