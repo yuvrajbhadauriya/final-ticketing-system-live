@@ -133,7 +133,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
                     <div style="margin-top: 25px; text-align: center;">
                         <p>You can also check and download your ticket from here:</p>
-                        <a href="https://tedxvips2025tickets.pythonanywhere.com/check-status/" style="background-color: #eb0028; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Check Ticket Status</a>
+                        <a href="https://passes.tedxvips.com/check-status/" style="background-color: #eb0028; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Check Ticket Status</a>
                     </div>
 
                     <div style="margin-top: 25px; font-size: 14px; text-align: center;">
