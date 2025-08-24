@@ -197,12 +197,13 @@ def accept_kiosk_request_view(request, request_id):
         attendee_type=kiosk_request.attendee_type,
         pass_type=kiosk_request.pass_type,
         transaction_id=f"KIOSK-CASH-({kiosk_request.cash_amount})-{request.user.username}",
-        status='pending',
+        # --- UPDATED: Set status directly to approved ---
+        status='approved',
         processed_by=request.user
     )
     
     kiosk_request.delete()
-    messages.success(request, f"Submission for '{kiosk_request.full_name}' has been successfully created.")
+    messages.success(request, f"Submission for '{kiosk_request.full_name}' has been successfully created and approved.")
     return redirect('kiosk_staff_dashboard')
 
 # Logic to reject/delete a kiosk request

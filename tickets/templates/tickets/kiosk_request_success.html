@@ -62,23 +62,49 @@
             backdrop-filter: blur(20px) brightness(1.2) saturate(1.5);
             padding: 2.5rem 2rem;
         }
+        .note-box {
+            background-color: rgba(255, 237, 119, 0.1); /* Light yellow transparent bg */
+            border-left: 4px solid #facc15; /* yellow-400 */
+            padding: 1rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-2xl mx-auto minimal-card text-center" style="position: relative; z-index: 1;">
         <h1 class="text-3xl font-extrabold mb-2 tracking-tight"><span style="color: #FFFFFF;">Request Sent!</span></h1>
+        
         <div class="mt-6 p-6 rounded-lg minimal-bg">
             <p class="text-lg font-medium">
                 Your request has been sent to the kiosk team member for confirmation.
             </p>
-            <p class="mt-2 text-sm text-gray-400">
-                Once they accept it, your submission will be added to the main system for final approval by a manager. Thank you!
-            </p>
+
+            <!-- UPDATED: Note Box -->
+            <div class="note-box">
+                <p class="font-bold text-yellow-300">NOTE:</p>
+                <p class="mt-1 text-sm text-yellow-200">
+                    Your IGNITED Pass will be approved within a minute. <strong>Please do not leave the kiosk until your ticket is approved.</strong> You can check your Pass status using the button below.
+                </p>
+            </div>
+            
+            <!-- UPDATED: Button Section -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'kiosk_request' %}" class="w-full sm:w-auto inline-block minimal-btn py-3 px-6">
+                    Submit Another Request
+                </a>
+                <a href="{% url 'check_status' %}" class="w-full sm:w-auto inline-block minimal-btn py-3 px-6">
+                    Check Ticket Status
+                </a>
+            </div>
         </div>
-        <div class="mt-8">
-            <a href="{% url 'kiosk_request' %}" class="w-full sm:w-auto inline-block minimal-btn py-3 px-6">
-                Submit Another Request
-            </a>
+
+        <!-- UPDATED: Footer for complaints -->
+        <div class="mt-8 text-xs text-gray-400 border-t border-gray-700 pt-4">
+            For complaints or issues at the kiosk, kindly contact us at 
+            <a href="https://wa.me/916398979052?text=I%20have%20a%20complaint/issue%20related%20to%20IGNITED%20Pass%20at%20Kiosk" class="font-bold accent hover:underline transition">WhatsApp</a> 
+            or 
+            <a href="mailto:TEDxVIPS.tickets@gmail.com?subject=Complaint/Issue%20at%20Kiosk" class="font-bold accent hover:underline transition">Email</a>.
         </div>
     </div>
 </body>
