@@ -129,9 +129,9 @@ class SubmissionAdmin(ImportExportModelAdmin):
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
                         <p style="font-weight: bold; color: #888888;">Important Information:</p>
                         <ul style="color: #888888; font-size: 14px; list-style-type: disc; padding-left: 20px;">
-                            <li>Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.</li>
-                            <li>A wristband will be provided to you on the day of the event at the venue.</li>
+                            <li>You can check your IGNITED Pass status also on the "Check Ticket Status" page.</li>
                             <li>Each ticket contains a unique QR code and will be scanned only once for entry.</li>
+                            <li>This pass is non-transferable and non-refundable.</li>
                             <li>Re-entry or second scans will not be permitted.</li>
                         </ul>
                     </div>
