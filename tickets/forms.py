@@ -28,7 +28,6 @@ class KioskRequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # --- THIS IS THE FIX ---
-        # Only show users who are in the "Kiosk Team" group
+        # This line filters the dropdown
         self.fields['assigned_to'].queryset = User.objects.filter(groups__name='Kiosk Team')
         self.fields['assigned_to'].label = "Kiosk Team Member"

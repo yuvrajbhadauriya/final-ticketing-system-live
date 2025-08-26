@@ -191,16 +191,24 @@ def accept_kiosk_request_view(request, request_id):
         kiosk_request.delete()
         return redirect('kiosk_staff_dashboard')
 
-    Submission.objects.create(
+    # --- FIX: Create the submission and then generate the ticket ID ---
+    # Step 1: Create the new submission object
+    new_submission = Submission.objects.create(
         full_name=kiosk_request.full_name,
         email=kiosk_request.email,
         attendee_type=kiosk_request.attendee_type,
         pass_type=kiosk_request.pass_type,
         transaction_id=f"KIOSK-CASH-({kiosk_request.cash_amount})-{request.user.username}",
-        # --- UPDATED: Set status directly to approved ---
         status='approved',
         processed_by=request.user
     )
+    
+    # Step 2: Now that the submission has an ID, generate the ticket_id
+    ticket_id_num = 2500000 + new_submission.id
+    new_submission.ticket_id = f"TEDxVIPS{ticket_id_num}"
+    
+    # Step 3: Save the submission again to store the new ticket_id
+    new_submission.save()
     
     kiosk_request.delete()
     messages.success(request, f"Submission for '{kiosk_request.full_name}' has been successfully created and approved.")
