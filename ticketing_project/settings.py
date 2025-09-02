@@ -46,7 +46,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = '/home/tedxvips2025tickets/final-ticketing-system-live/media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
