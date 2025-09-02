@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # values directly on the server. Do not commit your real secrets to GitHub.
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local-use-only')
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'false' # Ensures DEBUG is False on server
 
 # --- HOSTS CONFIGURATION ---
 ALLOWED_HOSTS = [
@@ -18,9 +18,8 @@ ALLOWED_HOSTS = [
     'tedxvips2025tickets.pythonanywhere.com',
     'passes.tedxvips.com',
     'www.passes.tedxvips.com',
+    '127.0.0.1', # For local testing
 ]
-if DEBUG:
-    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
 
 CSRF_TRUSTED_ORIGINS = [
     'https://yuvrajbhadauriya.pythonanywhere.com',
@@ -28,7 +27,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://passes.tedxvips.com',
     'https://www.passes.tedxvips.com',
 ]
-if DEBUG:
+if os.environ.get('DEBUG', 'False').lower() == 'true':
     CSRF_TRUSTED_ORIGINS.append('http://127.0.0.1:8000')
 
 # --- APP CONFIGURATION ---
@@ -43,19 +42,21 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
+
+# --- Static and Media Files ---
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- EMAIL CONFIGURATION ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'tedxvips.tickets@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'tktdyntdzztllxsv')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'your-email@example.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'your-password')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 

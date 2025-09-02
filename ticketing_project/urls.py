@@ -3,17 +3,18 @@ URL configuration for ticketing_project project.
 """
 from django.contrib import admin
 from django.urls import path, include
-# --- FIX: Import settings and static ---
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('tickets.urls')),
+    path('', include('tickets.urls')), # Includes all URLs from your tickets app
 ]
 
-# --- FIX: Add this block to serve media files when DEBUG is False ---
-# This tells Django how to find and serve your uploaded screenshots and IDs on the live server.
-if not settings.DEBUG:
+# This block is for LOCAL DEVELOPMENT ONLY.
+# It tells Django's local test server how to serve user-uploaded media files.
+# On your live PythonAnywhere server, this code is ignored, and the "Static files"
+# mapping you configured on the "Web" tab is used instead.
+if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
