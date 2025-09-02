@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # values directly on the server. Do not commit your real secrets to GitHub.
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local-use-only')
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # --- HOSTS CONFIGURATION ---
 ALLOWED_HOSTS = [
