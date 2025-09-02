@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # values directly on the server. Do not commit your real secrets to GitHub.
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local-use-only')
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # --- HOSTS CONFIGURATION ---
 ALLOWED_HOSTS = [
@@ -46,7 +46,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/tedxvips2025tickets/final-ticketing-system-live/media'
+MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
