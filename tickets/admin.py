@@ -4,6 +4,7 @@ from .pdf_utils import generate_ticket_pdf
 from django.core.mail import EmailMultiAlternatives
 from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html
+from django.conf import settings # Import Django's settings
 
 @admin.register(Submission)
 class SubmissionAdmin(ImportExportModelAdmin):
@@ -74,61 +75,52 @@ class SubmissionAdmin(ImportExportModelAdmin):
         emails_sent = 0
         for submission in approved_submissions:
             if not submission.ticket_id:
-                self.message_user(request, f"Submission for {submission.email} must be approved and saved before sending email.", level=messages.WARNING)
+                self.message_user(request, f"Submission for {submission.email} must be approved before sending email.", level=messages.WARNING)
                 continue
             
             pdf_buffer = generate_ticket_pdf(submission)
             
             try:
                 subject = "CONGRATS FOR SECURING YOUR PASS FOR IGNITED 2025"
-                from_email = 'your_email@gmail.com'
+                # --- FIX: Use the email from settings.py ---
+                from_email = settings.DEFAULT_FROM_EMAIL
                 to = [submission.email]
 
                 text_content = f"""
                 Hi {submission.full_name},
                 
                 CONGRATS FOR SECURING YOUR PASS FOR IGNITED 2025.
-                We assure you that you are going to have the best time. Thank you for being a part of this legacy.
-                
                 Your ticket is attached below.
                 
                 Important Information:
                 - Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.
-                - IGNITED25 Passes are non refundable.
+                - IGNITED25 Passes are non-refundable.
                 - Each ticket contains a unique QR code and will be scanned only once for entry.
                 - Re-entry or second scans will not be permitted.
-                
-                See you at the event,
-                Event Management Team
-                IGNITED | TEDxVIPS 2025
                 """
-
+                
                 html_content = f"""
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;">
                     <h2 style="color: #eb0028;">CONGRATS FOR SECURING YOUR PASS FOR IGNITED 2025</h2>
                     <p>Hi {submission.full_name},</p>
                     <p>We assure you that you are going to have the best time. Thank you for being a part of this legacy.</p>
                     <p><b>Your ticket is attached below.</b></p>
-                    
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
                         <p style="font-weight: bold;">Important Information:</p>
-                        <ul style="color: #333; font-size: 14px; list-style-type: disc; padding-left: 20px;">
+                        <ul style="font-size: 14px; list-style-type: disc; padding-left: 20px;">
                             <li>Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.</li>
-                            <li>IGNITED'25 Passes are non-refundable.</li>
+                            <li>IGNITED25 Passes are non-refundable.</li>
                             <li>Each ticket contains a unique QR code and will be scanned only once for entry.</li>
                             <li>Re-entry or second scans will not be permitted.</li>
                         </ul>
                     </div>
-
                     <div style="margin-top: 25px; text-align: center;">
                         <p>You can also check and download your ticket from here:</p>
-                        <a href="https://passes.tedxvips.com/check-status/" style="background-color: #eb0028; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Check Ticket Status</a>
+                        <a href="https://passes.tedxvips.com/check-status/" style="background-color: #eb0028; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Check Ticket Status</a>
                     </div>
-
                     <div style="margin-top: 25px; font-size: 14px; text-align: center;">
-                        <p>For queries, <a href="https://wa.me/916398979052?text=Hello,%20I%20have%20some%20query/issue%20related%20to%20tickets%20for%20IGNITED'25" style="color: #eb0028; font-weight: bold;">contact us on WhatsApp</a> or reply to this email.</p>
+                        <p>For queries, <a href="https://wa.me/916398979052?text=Hello" style="color: #eb0028; font-weight: bold;">contact us on WhatsApp</a> or reply to this email.</p>
                     </div>
-
                     <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
                         <p>See you at the event,<br>
                         <b>Event Management Team</b><br>
@@ -139,9 +131,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
                 msg = EmailMultiAlternatives(subject, text_content, from_email, to)
                 msg.attach_alternative(html_content, "text/html")
-                
                 msg.attach(f'ticket_{submission.ticket_id}.pdf', pdf_buffer.getvalue(), 'application/pdf')
-                
                 msg.send()
                 
                 submission.email_sent = True
@@ -155,21 +145,19 @@ class SubmissionAdmin(ImportExportModelAdmin):
         else:
             self.message_user(request, "No approved, unsent submissions were selected.", level=messages.WARNING)
 
-
-# --- NEW: Read-only admin view for KioskRequest ---
+# --- NEW: Read-Only Admin View for Kiosk Requests ---
+# This creates a permanent, unchangeable log of all kiosk cash transactions.
 @admin.register(KioskRequest)
 class KioskRequestAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'attendee_type', 'pass_type', 'cash_amount', 'assigned_to', 'created_at')
-    list_filter = ('assigned_to', 'attendee_type', 'pass_type')
+    list_display = ('full_name', 'email', 'assigned_to', 'cash_amount', 'created_at')
+    list_filter = ('assigned_to', 'created_at')
     search_fields = ('full_name', 'email', 'assigned_to__username')
-    readonly_fields = ('full_name', 'email', 'attendee_type', 'pass_type', 'cash_amount', 'assigned_to', 'created_at')
-
+    
+    # This makes the entire model read-only in the admin panel.
     def has_add_permission(self, request):
         return False
-
     def has_change_permission(self, request, obj=None):
         return False
-
     def has_delete_permission(self, request, obj=None):
         return False
 
