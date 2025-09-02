@@ -1,24 +1,18 @@
 from django.contrib import admin, messages
-from .models import Submission
+from .models import Submission, KioskRequest # Make sure KioskRequest is imported
 from .pdf_utils import generate_ticket_pdf
-from django.core.mail import EmailMultiAlternatives # Import for HTML emails
+from django.core.mail import EmailMultiAlternatives
 from import_export.admin import ImportExportModelAdmin
-from django.utils.html import format_html # Import for displaying images
+from django.utils.html import format_html
 
 @admin.register(Submission)
 class SubmissionAdmin(ImportExportModelAdmin):
-    # --- UPDATED: Added pass_type and transaction_id to the display list ---
     list_display = ('full_name', 'email', 'attendee_type', 'pass_type', 'transaction_id', 'ticket_id', 'status', 'email_sent', 'checked_in')
-    
-    # --- UPDATED: Added pass_type to the filters ---
     list_filter = ('status', 'attendee_type', 'pass_type', 'checked_in', 'email_sent')
-    
     search_fields = ('full_name', 'email', 'ticket_id', 'transaction_id')
     actions = ['send_ticket_emails']
-    # This makes the 'status' field an editable dropdown in the list view
     list_editable = ('status',)
 
-    # Base readonly fields for all users
     readonly_fields = (
         'submitted_at', 'updated_at', 'processed_by', 'ticket_id', 
         'qr_code_id', 'vips_id_card_preview', 'screenshot_preview'
@@ -26,7 +20,6 @@ class SubmissionAdmin(ImportExportModelAdmin):
 
     fieldsets = (
         ('Submission Details', {
-            # --- UPDATED: Added pass_type to the details view ---
             'fields': ('full_name', 'email', 'attendee_type', 'pass_type', 'transaction_id')
         }),
         ('Verification Images', {
@@ -59,13 +52,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
         can_edit_status_fields = request.user.has_perm('tickets.can_change_status_fields') or request.user.is_superuser
 
         if not can_edit_details:
-            fields.extend([
-                'full_name', 
-                'email', 
-                'attendee_type',
-                'pass_type',
-                'transaction_id',
-            ])
+            fields.extend(['full_name', 'email', 'attendee_type', 'pass_type', 'transaction_id'])
         
         if not can_edit_status_fields:
             fields.extend(['checked_in', 'email_sent'])
@@ -73,16 +60,13 @@ class SubmissionAdmin(ImportExportModelAdmin):
         return tuple(fields)
 
     def save_model(self, request, obj, form, change):
-        # --- FIX: Save the object to the database FIRST ---
-        # This generates the obj.id needed for the ticket_id
         obj.processed_by = request.user
         super().save_model(request, obj, form, change)
 
-        # --- Now, generate the ticket_id if needed ---
         if obj.status == 'approved' and not obj.ticket_id:
-            ticket_id_num = 2500000 + obj.id # obj.id now exists
+            ticket_id_num = 2500000 + obj.id
             obj.ticket_id = f"TEDxVIPS{ticket_id_num}"
-            obj.save() # Save the object again to store the new ticket_id
+            obj.save()
 
     @admin.action(description="Send Ticket Email to Selected")
     def send_ticket_emails(self, request, queryset):
@@ -97,7 +81,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
             
             try:
                 subject = "CONGRATS FOR SECURING YOUR PASS FOR IGNITED 2025"
-                from_email = 'your_email@gmail.com' # Make sure to use your actual sender email
+                from_email = 'your_email@gmail.com'
                 to = [submission.email]
 
                 text_content = f"""
@@ -109,8 +93,8 @@ class SubmissionAdmin(ImportExportModelAdmin):
                 Your ticket is attached below.
                 
                 Important Information:
-                - Your ticket will be downloadable on the "Check Ticket Status" page.
-                - A wristband will be provided to you on the day of the event.
+                - Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.
+                - IGNITED25 Passes are non refundable.
                 - Each ticket contains a unique QR code and will be scanned only once for entry.
                 - Re-entry or second scans will not be permitted.
                 
@@ -127,11 +111,11 @@ class SubmissionAdmin(ImportExportModelAdmin):
                     <p><b>Your ticket is attached below.</b></p>
                     
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <p style="font-weight: bold; color: #888888;">Important Information:</p>
-                        <ul style="color: #888888; font-size: 14px; list-style-type: disc; padding-left: 20px;">
-                            <li>You can check your IGNITED Pass status also on the "Check Ticket Status" page.</li>
+                        <p style="font-weight: bold;">Important Information:</p>
+                        <ul style="color: #333; font-size: 14px; list-style-type: disc; padding-left: 20px;">
+                            <li>Your ticket will be downloadable on the "Check Ticket Status" page and will also be mailed to you upon approval.</li>
+                            <li>IGNITED'25 Passes are non-refundable.</li>
                             <li>Each ticket contains a unique QR code and will be scanned only once for entry.</li>
-                            <li>This pass is non-transferable and non-refundable.</li>
                             <li>Re-entry or second scans will not be permitted.</li>
                         </ul>
                     </div>
@@ -170,3 +154,22 @@ class SubmissionAdmin(ImportExportModelAdmin):
             self.message_user(request, f"Successfully sent {emails_sent} ticket email(s).", level=messages.SUCCESS)
         else:
             self.message_user(request, "No approved, unsent submissions were selected.", level=messages.WARNING)
+
+
+# --- NEW: Read-only admin view for KioskRequest ---
+@admin.register(KioskRequest)
+class KioskRequestAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'attendee_type', 'pass_type', 'cash_amount', 'assigned_to', 'created_at')
+    list_filter = ('assigned_to', 'attendee_type', 'pass_type')
+    search_fields = ('full_name', 'email', 'assigned_to__username')
+    readonly_fields = ('full_name', 'email', 'attendee_type', 'pass_type', 'cash_amount', 'assigned_to', 'created_at')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+

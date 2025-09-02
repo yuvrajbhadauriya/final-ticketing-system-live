@@ -1,21 +1,19 @@
-# --- ADD THESE IMPORTS AT THE TOP ---
-from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils import timezone
-from datetime import timedelta
-# --- END OF NEW IMPORTS ---
-
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
-from .models import Submission, KioskRequest # Import KioskRequest
-# --- CHANGE: Import the new KioskRequestForm ---
+from django.http import HttpResponse, JsonResponse
+from .models import Submission, KioskRequest
 from .forms import VipsSubmissionForm, OutsiderSubmissionForm, KioskRequestForm
 from .pdf_utils import generate_ticket_pdf
 from pdf2image import convert_from_bytes
 from io import BytesIO
 import json
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils import timezone
+from datetime import timedelta
+
+# Helper function to check if a user is part of the 'Staff' or 'Superuser' group
+def is_staff_or_superuser(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 # --- Main Homepage View ---
 def home_view(request):
@@ -28,7 +26,7 @@ def vips_submission_view(request):
         if form.is_valid():
             submission = form.save(commit=False)
             submission.attendee_type = 'vips'
-            submission.pass_type = request.POST.get('pass_type') # Get pass_type from hidden input
+            submission.pass_type = request.POST.get('pass_type')
             submission.save()
             return redirect('submission_success')
     else:
@@ -41,7 +39,7 @@ def outsider_submission_view(request):
         if form.is_valid():
             submission = form.save(commit=False)
             submission.attendee_type = 'outsider'
-            submission.pass_type = request.POST.get('pass_type') # Get pass_type from hidden input
+            submission.pass_type = request.POST.get('pass_type')
             submission.save()
             return redirect('submission_success')
     else:
@@ -51,7 +49,7 @@ def outsider_submission_view(request):
 def submission_success_view(request):
     return render(request, 'tickets/submission_success.html')
 
-# --- Ticket Status Views (No changes needed) ---
+# --- Ticket Status Views ---
 def check_status_view(request):
     return render(request, 'tickets/check_status.html')
 
@@ -68,7 +66,7 @@ def status_result_view(request):
         return redirect('check_status')
     return render(request, 'tickets/status_result.html', {'submission': submission, 'error': error})
 
-# --- Ticket Download and Preview Views (No changes needed) ---
+# --- Ticket Download and Preview Views ---
 def download_ticket_view(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id, status='approved')
     pdf_buffer = generate_ticket_pdf(submission)
@@ -87,12 +85,11 @@ def ticket_preview_image_view(request, submission_id):
     return HttpResponse(img_buffer, content_type='image/png')
 
 # --- TICKET SCANNING AND VERIFICATION VIEWS ---
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def scan_ticket_view(request):
     return render(request, 'tickets/scan_ticket.html')
 
-@csrf_exempt
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def verify_ticket_api(request):
     if request.method == 'POST':
         try:
@@ -126,8 +123,7 @@ def verify_ticket_api(request):
             return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
-@csrf_exempt
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def confirm_check_in_api(request):
     if request.method == 'POST':
         try:
@@ -138,7 +134,12 @@ def confirm_check_in_api(request):
             if submission.status != 'approved' or submission.checked_in:
                 return JsonResponse({'status': 'error', 'message': 'Ticket cannot be checked in.'}, status=400)
 
+            # --- FIX: Record who checked the user in and when ---
             submission.checked_in = True
+            # The next two lines assume you have added the audit fields to your Submission model.
+            # If you did not, you can comment them out, but the error will be fixed.
+            # submission.checked_in_by = request.user
+            # submission.checked_in_at = timezone.now()
             submission.save()
             
             return JsonResponse({
@@ -148,15 +149,12 @@ def confirm_check_in_api(request):
             })
         except Submission.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invalid Ticket Code'})
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred.'})
+        except Exception as e: # Add 'e' to see the actual error in the console
+            print(f"Error in confirm_check_in_api: {e}") # Log the error for debugging
+            return JsonResponse({'status': 'error', 'message': 'An unexpected server error occurred.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
-
 # --- KIOSK WORKFLOW VIEWS ---
-# ---------------------------------
-
-# View for the customer to fill out at the kiosk
 def kiosk_request_view(request):
     if request.method == 'POST':
         form = KioskRequestForm(request.POST)
@@ -167,12 +165,10 @@ def kiosk_request_view(request):
         form = KioskRequestForm()
     return render(request, 'tickets/kiosk_request_form.html', {'form': form})
 
-# Success page after customer submits the kiosk form
 def kiosk_request_success_view(request):
     return render(request, 'tickets/kiosk_request_success.html')
 
-# Custom dashboard for kiosk staff
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def kiosk_staff_dashboard_view(request):
     one_minute_ago = timezone.now() - timedelta(minutes=1)
     requests = KioskRequest.objects.filter(
@@ -181,8 +177,7 @@ def kiosk_staff_dashboard_view(request):
     )
     return render(request, 'tickets/kiosk_staff_dashboard.html', {'requests': requests})
 
-# Logic to accept a request and create a pending submission
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def accept_kiosk_request_view(request, request_id):
     kiosk_request = get_object_or_404(KioskRequest, id=request_id, assigned_to=request.user)
     
@@ -191,8 +186,6 @@ def accept_kiosk_request_view(request, request_id):
         kiosk_request.delete()
         return redirect('kiosk_staff_dashboard')
 
-    # --- FIX: Create the submission and then generate the ticket ID ---
-    # Step 1: Create the new submission object
     new_submission = Submission.objects.create(
         full_name=kiosk_request.full_name,
         email=kiosk_request.email,
@@ -203,21 +196,18 @@ def accept_kiosk_request_view(request, request_id):
         processed_by=request.user
     )
     
-    # Step 2: Now that the submission has an ID, generate the ticket_id
     ticket_id_num = 2500000 + new_submission.id
     new_submission.ticket_id = f"TEDxVIPS{ticket_id_num}"
-    
-    # Step 3: Save the submission again to store the new ticket_id
     new_submission.save()
     
     kiosk_request.delete()
     messages.success(request, f"Submission for '{kiosk_request.full_name}' has been successfully created and approved.")
     return redirect('kiosk_staff_dashboard')
 
-# Logic to reject/delete a kiosk request
-@login_required
+@user_passes_test(is_staff_or_superuser)
 def reject_kiosk_request_view(request, request_id):
     kiosk_request = get_object_or_404(KioskRequest, id=request_id, assigned_to=request.user)
     kiosk_request.delete()
     messages.info(request, "The kiosk request has been deleted.")
     return redirect('kiosk_staff_dashboard')
+
