@@ -84,8 +84,8 @@ if DEVELOPMENT_MODE:
     EMAIL_HOST_PASSWORD = 'tktdyntdzztllxsv'
 else:
     # In production, credentials are read from secure environment variables.
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    EMAIL_HOST_USER = os.environ.get('tedxvips.tickets@gmail.com')
+    EMAIL_HOST_PASSWORD = os.environ.get('tktdyntdzztllxsv')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # --- PASSWORD VALIDATION ---
