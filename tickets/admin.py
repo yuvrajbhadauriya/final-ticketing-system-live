@@ -119,7 +119,7 @@ class SubmissionAdmin(ImportExportModelAdmin):
                         <a href="https://passes.tedxvips.com/check-status/" style="background-color: #eb0028; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Check Ticket Status</a>
                     </div>
                     <div style="margin-top: 25px; font-size: 14px; text-align: center;">
-                        <p>For queries, <a href="https://wa.me/916398979052?text=Hello" style="color: #eb0028; font-weight: bold;">contact us on WhatsApp</a> or reply to this email.</p>
+                        <p>For queries, <a href="https://wa.me/916398979052?text=Hello,%20I%20have%20some%20query/issue%20related%20to%20tickets%20for%20IGNITED'25" style="color: #eb0028; font-weight: bold;">contact us on WhatsApp</a> or reply to this email.</p>
                     </div>
                     <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
                         <p>See you at the event,<br>
