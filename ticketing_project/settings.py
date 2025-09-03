@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # values directly on the server. Do not commit your real secrets to GitHub.
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'a-default-secret-key-for-local-use-only')
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'false' # Ensures DEBUG is False on server
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'false'
 
 # --- HOSTS CONFIGURATION ---
 ALLOWED_HOSTS = [
@@ -18,17 +18,21 @@ ALLOWED_HOSTS = [
     'tedxvips2025tickets.pythonanywhere.com',
     'passes.tedxvips.com',
     'www.passes.tedxvips.com',
-    '127.0.0.1', # For local testing
+    '127.0.0.1',
 ]
 
+# --- FIX: ADD THIS ENTIRE BLOCK ---
 CSRF_TRUSTED_ORIGINS = [
     'https://yuvrajbhadauriya.pythonanywhere.com',
     'https://tedxvips2025tickets.pythonanywhere.com',
     'https://passes.tedxvips.com',
     'https://www.passes.tedxvips.com',
 ]
+# Add local development server if in debug mode
 if os.environ.get('DEBUG', 'False').lower() == 'true':
     CSRF_TRUSTED_ORIGINS.append('http://127.0.0.1:8000')
+# --- END OF FIX ---
+
 
 # --- APP CONFIGURATION ---
 INSTALLED_APPS = ['django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles', 'import_export', 'anymail', 'tickets']
@@ -42,13 +46,10 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
-
-# --- Static and Media Files ---
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- EMAIL CONFIGURATION ---
